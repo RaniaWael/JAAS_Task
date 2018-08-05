@@ -1,0 +1,33 @@
+swarm:
+  deployment:
+    example-jaas-basic.war:
+      web:
+        login-config:
+          auth-method: BASIC
+          security-domain: my-domain
+        security-constraints:
+          - url-pattern: /*
+            methods: [GET]
+            roles: [admin, user]
+          - url-pattern: /admin/*
+            methods: [GET]
+            roles: [admin]
+  security:
+    security-domains:
+      my-domain:
+        classic-authentication:
+          login-modules:
+            Database:
+              code: Database
+              flag: required
+              module-options:
+                dsJndiName: java:jboss/datasources/MyDS
+                principalsQuery: SELECT PASSWORD FROM USERS WHERE NAME=?
+                rolesQuery: SELECT ROLE, 'Roles' FROM USERS WHERE NAME=?
+  datasources:
+    data-sources:
+      MyDS:
+        driver-name: mysql
+        connection-url: jdbc:mysql://localhost:3306/AUTHDB
+        user-name: root
+        password: 12345678
